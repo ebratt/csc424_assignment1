@@ -15,8 +15,8 @@ lapply(c(IMAGES_DIR, OUTPUT_DIR),make_dir)
 
 ## function that concatenates strings (useful for directory paths)
 concat <- function(x1,x2) {
-  result <- paste(x1,x2,sep="")
-  return(result)
+    result <- paste(x1,x2,sep="")
+    return(result)
 }
 
 ## function that checks to see if a package is installed and,if not,installs it
@@ -28,16 +28,8 @@ load_package <- function(x) {
     else { 
         install.packages(x) 
     }
-  library(x, character.only=TRUE)
+    library(x, character.only=TRUE)
 }
-# lapply(c("car",
-#          "psych",
-#          "corrgram",
-#          "gclus",
-#          "lm.beta",
-#          "DAAG",
-#          "RColorBrewer"), 
-#        load_package)
 lapply(c("car"), load_package)
 
 #######################################################
@@ -57,8 +49,8 @@ colnames(data) <- c("iso_country_code",
 
 # create new variables
 data["medals_total"] <- data["medals_gold"] + 
-                        data["medals_silver"] + 
-                        data["medals_bronze"]
+    data["medals_silver"] + 
+    data["medals_bronze"]
 data["pct_f"] <- data["count_f"] / (data["count_f"] + data["count_m"])
 
 # drop the first two label/id columns, the counts of colored medals, 
@@ -82,19 +74,19 @@ OUTPUT_DIR <- './output'
 ## function that checks to see if a package is installed and,if not,installs it
 ## portions of this code came from http://stackoverflow.com/questions/9341635/how-can-i-check-for-installed-r-packages-before-running-install-packages
 load_package <- function(x) {
-  if (x %in% rownames(installed.packages())) { 
-    print(concat("package already installed: ", x))
-  }
-  else { 
-    install.packages(x) 
-  }
-  library(x, character.only=TRUE)
+    if (x %in% rownames(installed.packages())) { 
+        print(concat("package already installed: ", x))
+    }
+    else { 
+        install.packages(x) 
+    }
+    library(x, character.only=TRUE)
 }
 
 ## function that concatenates strings (useful for directory paths)
 concat <- function(x1,x2) {
-  result <- paste(x1,x2,sep="")
-  return(result)
+    result <- paste(x1,x2,sep="")
+    return(result)
 }
 
 # import the maple.txt file
@@ -188,19 +180,19 @@ OUTPUT_DIR <- './output'
 ## function that checks to see if a package is installed and,if not,installs it
 ## portions of this code came from http://stackoverflow.com/questions/9341635/how-can-i-check-for-installed-r-packages-before-running-install-packages
 load_package <- function(x) {
-  if (x %in% rownames(installed.packages())) { 
-    print(concat("package already installed: ", x))
-  }
-  else { 
-    install.packages(x) 
-  }
-  library(x, character.only=TRUE)
+    if (x %in% rownames(installed.packages())) { 
+        print(concat("package already installed: ", x))
+    }
+    else { 
+        install.packages(x) 
+    }
+    library(x, character.only=TRUE)
 }
 
 ## function that concatenates strings (useful for directory paths)
 concat <- function(x1,x2) {
-  result <- paste(x1,x2,sep="")
-  return(result)
+    result <- paste(x1,x2,sep="")
+    return(result)
 }
 
 # import the chicinsur.txt file
@@ -233,13 +225,13 @@ income <- data$income
 
 # what does the histogram of newpol look like?
 load_package('ggplot2')
-png(concat(IMAGES_DIR,'/problem3_histogram_newpol.png'), width = 1024, height = 1024)
+png(concat(IMAGES_DIR,'/problem3_histogram_newpol.png'), width = 512, height = 512)
 ggplot(data_plot, aes(x=newpol)) + 
-  geom_histogram(binwidth=.5, colour="black", fill="white") + 
-  geom_vline(data=data_plot, aes(xintercept=mean(newpol)),
-             linetype="dashed", size=1, colour="red") + 
-  labs(title="Histogram for New Policies per 100 Households") +
-  labs(x="New Policies per 100 Households", y="Frequency")
+    geom_histogram(binwidth=1, colour="black", fill="white") + 
+    geom_vline(data=data_plot, aes(xintercept=mean(newpol)),
+               linetype="dashed", size=1, colour="red") + 
+    labs(title="Histogram for New Policies per 100 Households") +
+    labs(x="New Policies per 100 Households", y="Frequency")
 dev.off()
 
 # what is the skew of the dependent variable?
@@ -271,7 +263,80 @@ summary(a)
 # Multiple R-squared:  0.7939,	Adjusted R-squared:  0.7688 
 # F-statistic: 31.59 on 5 and 41 DF,  p-value: 4.773e-13
 
+# look at collinearity
+write.table(cor(data_plot), file=concat(OUTPUT_DIR,'/problem3_model_correlations.csv'), sep=",")
+write.table(summary(a)$coefficients, file=concat(OUTPUT_DIR,'/problem3_model_coefficients.csv'), sep=",")
+write.table(anova(a), file=concat(OUTPUT_DIR,'/problem3_model_anova.csv'), sep=",")
+load_package('lm.beta')
+lm.a.beta <- lm.beta(a)
+write.table(coef(lm.a.beta), file=concat(OUTPUT_DIR,'/prblem3_model_coefficients_standard.csv'), sep=",")
+load_package('DAAG')
+vif(a)
+write("VIF", file=concat(OUTPUT_DIR,'/problem3_model_vif.csv'))
+write.table(vif(a), file=concat(OUTPUT_DIR,'/problem3_model_vif.csv'), sep=",", append=TRUE)
+write("", file=concat(OUTPUT_DIR,'/problem3_model_vif.csv'), append=TRUE)
+write("", file=concat(OUTPUT_DIR,'/problem3_model_vif.csv'), append=TRUE)
+sqrt(vif(a))
+write("sqrt(VIF)", file=concat(OUTPUT_DIR,'/problem3_model_vif.csv'), append=TRUE)
+write.table(sqrt(vif(a)), file=concat(OUTPUT_DIR,'/problem3_model_vif.csv'), sep=",", append=TRUE)
+# create corrgram
+load_package('corrgram')
+png(concat(IMAGES_DIR,'/problem3_corrgram.png'), height=1024, width=1024)
+corrgram(data_plot, order=TRUE, lower.panel=panel.shade, upper.panel=panel.pie, text.panel=panel.txt, main="Quantitative Variables in PC2/PC1 Order")
+dev.off()
 
 
+# plot of deleted studentized residuals vs hat values
+png(concat(IMAGES_DIR,'/problem3_model_influentials.png'))
+plot(hatvalues(a), rstudent(a))
+abline(a=0,b=0, col="red")
+# add labels to points
+text(hatvalues(a), rstudent(a), cex=0.7, pos=2)
+dev.off()
 
+# create a plot of residuals versus predicted values
+png(concat(IMAGES_DIR,'/problem3_residuals_vs_predicted.png'), width = 512, height = 512)
+plot(fitted(a), rstandard(a), main="Predicted vs. Residuals Plot")
+abline(a=0, b=0, col="red")
+text(fitted(a), rstandard(a), cex=0.7, pos=2)
+dev.off()
+
+# Assessing Outliers
+png(concat(IMAGES_DIR,'/problem3_model_qqplot.png'), width = 1024, height = 1024)
+qqPlot(a, main="QQ Plot") #qq plot for studentized resid 
+dev.off()
+png(concat(IMAGES_DIR,'/problem3_model_leverage_plots.png'), width = 1024, height = 1024)
+leveragePlots(a) # leverage plots
+dev.off()
+
+# print out only observations that may be influential
+write.table(summary(influence.measures(a)), 
+            file=concat(OUTPUT_DIR,'/problem3_model_influentials.csv'), sep=",")
+# Influential Observations
+# added variable plots 
+png(concat(IMAGES_DIR,'/problem3_added_value_plots.png'), width = 1024, height = 1024)
+avPlots(a)
+dev.off()
+# Cook's D plot
+# identify D values > 4/(n-k-1) 
+cutoff <- 4/((nrow(data_plot)-length(a$coefficients)-2)) 
+png(concat(IMAGES_DIR,'/problem3_cook_levels.png'), width = 1024, height = 1024)
+plot(a, which=4, cook.levels=cutoff)
+dev.off()
+# Influence Plot 
+png(concat(IMAGES_DIR,'/problem3_influence_plot.png'), width = 1024, height = 1024)
+influencePlot(a, id.method="identify", 
+              main="Influence Plot", 
+              sub="Circle size is proportial to Cook's Distance" )
+dev.off()
+
+# residuals histogram
+x = rstudent(a)
+png(concat(IMAGES_DIR,'/problem3_model_residuals_hist.png'))
+hist(x, breaks=100, col="red", xlab="New Policies per 100 Households", 
+     main="Histogram of Residuals with Normal Curve")
+xfit<-seq(min(x),max(x),length=40) 
+yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) 
+lines(xfit, yfit, col="blue", lwd=2)
+dev.off()
 
